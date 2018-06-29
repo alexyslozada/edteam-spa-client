@@ -1,0 +1,198 @@
+:root {
+    --blck: #191f29;
+    --gry: #909397;
+    --wht: white;
+    --wht2: #aaaaaa;
+    --blu: #0079db;
+}
+
+html {
+    font-size:14px;
+    font-family: sans-serif;
+}
+
+/*
+Chat page
+*/
+
+.container {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    height: 100vh;
+}
+
+.sidebar-container {
+    background: var(--blck);
+    padding: 1rem;
+    color: var(--wht2);
+    font-size: 14px;
+    display: grid;
+    grid-auto-rows: 55px 1fr 30px;
+}
+
+.sidebar-container h2 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    padding-bottom: 1rem;
+    border-bottom: 1px dotted var(--gry);        
+}
+
+.user {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: .5rem;
+}
+
+.user--name {
+    color: var(--wht);
+}
+
+.user--status {
+    color: var(--wht2);
+    font-style: italic;
+    font-size: .85rem;
+    line-height: 1.75;
+}
+
+.account {
+    display: flex;
+    text-align: center;
+    align-items: center;
+}
+
+.account a:hover {
+    background: var(--blu);
+}
+
+.account a {
+    background: var(--gry);
+    color: var(--wht);
+    width: 100%;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+
+a{
+    padding: .5rem 0;
+}
+
+.brand {
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px dotted var(--gry);     
+}
+
+.brand img {
+    max-width: 120px;
+}
+
+.main-container {
+    display: grid;
+    grid-template-rows: 80px calc(100vh - 130px) 50px;
+}
+
+.chat-details {
+    border-bottom: 1px dotted var(--gry);
+    padding: 0 1rem;
+}
+
+.chat-details h1 {
+    font-size: 1.75rem;
+    margin: 1rem 0 0 0;
+    color: var(--blck);
+}
+
+.chat-details span {
+    color: var(--gry);
+}
+
+.messages-container {
+    display: flex;
+    align-content: flex-end;
+    flex-wrap: wrap;
+    overflow: scroll;
+    height: calc(100vh - 130px)
+}
+
+.message {
+    display: flex;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.message--avatar {
+    padding: 0 1rem;
+}
+.message--avatar img{
+    width: 60px;
+}
+
+.message--user {
+    color: var(--gry);
+    margin-bottom: .25rem;
+}
+
+.message-form {
+    display: flex;
+}
+
+.message-form--text {
+    flex-grow: 2;
+    height: 50px;
+    padding: 0 0 0 1rem;
+    margin: 0;
+    border: none;
+    border-top: 1px dotted var(--gry);
+    color: gray;
+}
+
+.message-form--submit {
+    background: var(--blu);
+    color: var(--wht);
+    border: none;
+    min-width: 80px;
+}
+
+/*
+Login page
+*/
+
+.login-page {
+    background: var(--blck);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.login-container {
+    padding: 3rem;
+    border: 1px solid var(--gry);
+    border-radius: 1rem;
+    background: var(--blck);
+}
+
+.brand-login {
+    margin-bottom: 4rem;
+    text-align: center;
+}
+
+.brand-login img {
+    max-width: 250px;
+}
+
+.form-login input {
+    margin-bottom: 1.5rem;
+    height: 35px;
+    border: none;
+    border-radius: 5px;
+    width: 100%
+}
+
+.form-login--submit {
+    background: var(--blu);
+    color: var(--wht);
+    padding: 0 2rem 
+}
