@@ -2,24 +2,17 @@ const apiURL = 'http://localhost:9393/api'
 const apiRegister = apiURL + '/v1/register'
 const apiLogin = apiURL + '/v1/login'
 
-const prepareRegister = async () => {
-    const user = {
-        nick_name : 'jenny',
-        password : '159'
-    }
+const prepareRegister = async user => {
     const data = await executeService(apiRegister, 'POST', user)
-    console.log(data)
+    return data
 }
 
-const prepareLogin = async () => {
-    const user = {
-        nick_name : 'jenny',
-        password : '159'
-    }
+const prepareLogin = async user => {
     const data = await executeService(apiLogin, 'POST', user)
     if (data.type === 'ok') {
         localStorage.setItem('token', data.data)
         console.log('token guardado')
+        return data
     }
 }
 
@@ -66,32 +59,61 @@ const mensajeImpreso = data => {
 
 // Código necesario para escribir en tiempo real los mensajes con WebSockets
 
-const user1 = 'jenny'
-const token1 = localStorage.getItem('token')
-const wsURL = `ws://localhost:9393/ws?nick=${user1}&token=${token1}`
-
-const ws = new WebSocket(wsURL);
-ws.onopen = () => { console.log("Se ha establecido conexión con el websocket") }
-ws.onerror = error => { console.log(error) }
-
-ws.onmessage = mensaje => { 
-    console.log(mensaje.data)
-    mensajeImpreso(JSON.parse(mensaje.data))
+const eventFormRegister = () => {
+    const formRegister = document.getElementById('form-registro')
+    if (formRegister) {
+        formRegister.addEventListener('submit', e => {
+            e.preventDefault()
+            let user = {
+                nick_name: e.target.userName.value,
+                password: e.target.userPass.value
+            }
+            prepareRegister(user)
+                .then(data => {
+                    console.log(data)
+                    formRegister.innerHTML = `
+                        <p>Usted ha sido registrado exitosamente ahora puede iniciar sesión</p>
+                    `
+                })
+        })
+    }
 }
 
-
-const form1 = document.getElementById('message-form')
-
-form1.addEventListener('submit', e => {
-    e.preventDefault()
-    let mensajeEscrito = e.target.messageText.value
-    let mensajeParaEnviar = {
-        type: "mensaje",
-        data: mensajeEscrito
+const eventFormLogin = () => {
+    const formLogin = document.getElementById('form-login')
+    if (formLogin) {
+        formLogin.addEventListener('submit', e => {
+            e.preventDefault()
+            let user ={
+                nick_name: e.target.userName.value,
+                password: e.target.userPass.value
+            }
+            prepareLogin(user)
+            .then(data => {
+                if(data.type == "ok") {
+                    localStorage.setItem('user', e.target.userName.value)
+                    wsInit()
+                    Router.navigate('/chat')
+                }
+            }).catch(e => {
+                console.log(e)
+            })
+        })
     }
-    ws.send(JSON.stringify(mensajeParaEnviar))
-    e.target.messageText.value = ""
-})
+}
 
-
-//ws.send()
+const eventForm1 = () => {
+    const form1 = document.getElementById('message-form')
+    if (form1) {
+        form1.addEventListener('submit', e => {
+            e.preventDefault()
+            let mensajeEscrito = e.target.messageText.value
+            let mensajeParaEnviar = {
+                type: "mensaje",
+                data: mensajeEscrito
+            }
+            ws.send(JSON.stringify(mensajeParaEnviar))
+            e.target.messageText.value = ""
+        })
+    }
+}
