@@ -34,26 +34,60 @@ const executeService = async (uri, met, user) => {
 //prepareRegister()
 prepareLogin()
 
+// TODO cambiar el nombre de la función por algo como processMessage
 const mensajeImpreso = data => {
-    let contenido = `
-        <div class="message">
-            <div class="message--avatar">
-                <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=retro&f=y" alt="User Avatar">
-            </div>
-            <div class="message--info">
-                <div class="message--user">
-                    <span class="message--user_name">${data.from}</span>
-                    <span class="message--user_time">${new Date() / 1000}</span>
+    const now = new Date()
+    const element = document.getElementById('messages-container')
+    switch (data.type) {
+        case "connect":
+            const person = `
+                <div class="user">
+                    <span class="user--name">${data.from}</span>
+                    <span class="user--status">En linea</span>
                 </div>
-                <div class="message--content">
-                    ${data.data}
+            `
+            if (usersConnected) usersConnected.insertAdjacentHTML('beforeend', person)
+            break
+        case "mensaje":
+            const contenidoMensaje = `
+                <div class="message">
+                    <div class="message--avatar">
+                        <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=retro&f=y" alt="User Avatar">
+                    </div>
+                    <div class="message--info">
+                        <div class="message--user">
+                            <span class="message--user_name">${data.from}</span>
+                            <span class="message--user_time">${now.getHours()}:${now.getMinutes()}</span>
+                        </div>
+                        <div class="message--content">
+                            ${data.data}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    `
-    if (data.data) {
-        let element = document.getElementById('messages-container')
-        element.innerHTML = element.innerHTML + contenido
+            `
+            element.insertAdjacentHTML('beforeend', contenidoMensaje)  
+            break
+        case "giphy":
+            const contenidoGiphy = `
+                <div class="message">
+                    <div class="message--avatar">
+                        <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=retro&f=y" alt="User Avatar">
+                    </div>
+                    <div class="message--info">
+                        <div class="message--user">
+                            <span class="message--user_name">${data.from}</span>
+                            <span class="message--user_time">${now.getHours()}:${now.getMinutes()}</span>
+                        </div>
+                        <div class="message--content">
+                            <img src="${data.data}" alt="Este es un gif">
+                        </div>
+                    </div>
+                </div>
+            `
+            element.insertAdjacentHTML('beforeend', contenidoGiphy)  
+            break
+        default:
+            console.log('no se recibió un tipo válido')
     }
 }
 
@@ -73,7 +107,12 @@ const eventFormRegister = () => {
                     console.log(data)
                     formRegister.innerHTML = `
                         <p>Usted ha sido registrado exitosamente ahora puede iniciar sesión</p>
+                        <a href="#" id="linkLogin">Iniciar Sesión</a>
                     `
+                    linkLogin.addEventListener('click', e => {
+                        e.preventDefault()
+                        Router.navigate('/login')
+                    })
                 })
         })
     }
@@ -105,12 +144,30 @@ const eventFormLogin = () => {
 const eventForm1 = () => {
     const form1 = document.getElementById('message-form')
     if (form1) {
-        form1.addEventListener('submit', e => {
+        form1.addEventListener('submit', async e => {
             e.preventDefault()
+            let mensajeParaEnviar = {}
             let mensajeEscrito = e.target.messageText.value
-            let mensajeParaEnviar = {
-                type: "mensaje",
-                data: mensajeEscrito
+            if (mensajeEscrito.startsWith('/giphy')) {
+                const q = encodeURI(mensajeEscrito.substring(7))
+                const headers = new Headers()
+                headers.append('Content-Type', 'application/json')
+                const myInit = {
+                    method: 'GET', 
+                    headers: headers,  
+                    mode: 'cors', 
+                    cache: 'default'
+                }
+                const apiKey = 'mto0q23ZXsGlZDFANOaT1yeVDeR2mmwX'
+                const uri = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${q}&limit=1`
+                const res = await fetch(uri, myInit)
+                const data = await res.json()
+                // console.log(data)
+                mensajeParaEnviar.type = 'giphy'
+                mensajeParaEnviar.data = data.data[0].images.fixed_height.url
+            } else {
+                mensajeParaEnviar.type = 'mensaje'
+                mensajeParaEnviar.data = mensajeEscrito
             }
             ws.send(JSON.stringify(mensajeParaEnviar))
             e.target.messageText.value = ""

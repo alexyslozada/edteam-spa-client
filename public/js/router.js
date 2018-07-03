@@ -1,3 +1,6 @@
+// Creamos el objeto global ws para acceder al websocket desde diferentes funciones
+let ws
+
 const Router = {
     routes: [],
     mode: null,
@@ -102,8 +105,13 @@ Router.add(/login/, function(){
             <input type="password" class="form-login--pass" placeholder="Contraseña" name="userPass">
             <input type="submit" value="Ingresar" class="form-login--submit">
         </form>
+        <a href="#" id="linkRegistro">Registro</a>
     </div>
     `
+    linkRegistro.addEventListener('click', e => {
+        e.preventDefault()
+        Router.navigate('/registro')
+    })
     eventFormLogin()
 }).add(/registro/, () => {
     document.body.classList.add('login-page')
@@ -129,7 +137,7 @@ Router.add(/login/, function(){
         <div class="brand">
             <img src="https://app.ed.team/static/media/logo-alt.fd226574.svg" alt="Logo EDteam" class="logo">
         </div>
-        <div class="users">
+        <div class="users" id="usersConnected">
             <h2>Usuarios contectados</h2>
             <div class="user">
                 <span class="user--name">Beto Quiroga</span>
@@ -137,7 +145,7 @@ Router.add(/login/, function(){
             </div>
         </div>
         <div class="account">
-            <a id="cerrar-sesion">Cerrar Sesión</a>
+            <a id="cerrarSesion" href="#">Cerrar Sesión</a>
         </div>
     </aside>
     <main class="main-container">
@@ -150,13 +158,14 @@ Router.add(/login/, function(){
         </div>
         <div class="form-container">
             <form class="message-form" id="message-form">
-                <input  class="message-form--text" type="text" placeholder="Ingrese su mensaje" name="messageText">
+                <input  class="message-form--text" type="text" autocomplete="off" placeholder="Ingrese su mensaje" name="messageText">
                 <input class="message-form--submit" type="submit" value="Enviar">
             </form>
         </div>
     </main>
     `
-    document.getElementById('cerrar-sesion').addEventListener('click', e => {
+    cerrarSesion.addEventListener('click', e => {
+        ws.close()
         localStorage.clear()
         Router.navigate('/login')
     })
@@ -171,7 +180,7 @@ const wsInit = () => {
         const token1 = localStorage.getItem('token')
         const wsURL = `ws://localhost:9393/ws?nick=${user1}&token=${token1}`
 
-        const ws = new WebSocket(wsURL);
+        ws = new WebSocket(wsURL);
         ws.onopen = () => { console.log("Se ha establecido conexión con el websocket") }
         ws.onerror = error => { console.log(error) }
 
